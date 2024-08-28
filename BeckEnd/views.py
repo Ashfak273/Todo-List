@@ -21,7 +21,7 @@ def todo_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-@api_view(["GET", "PUT", "DELETE"])
+@api_view(["GET", "PUT", "PATCH" "DELETE"])
 def todo_detail(request, id_num):
     todos = get_object_or_404(Todo, id=id_num)
 
