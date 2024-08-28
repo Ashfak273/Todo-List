@@ -7,6 +7,7 @@ import Filter from "./components/Filter";
 function App() {
   const [todos, setTodos] = useState([]);
   const [errors, setErrors] = useState("");
+  const [filter, setFilter] = useState("All");
 
   useEffect(() => {
     axios.get("http://127.0.0.1:8000/todos")
@@ -53,27 +54,19 @@ function App() {
   };
 
   const completeTodo = (e, id, todo) => {
-
-    if(e.target.checked){
-      console.log("okay")
-      setTodos(todos.map(todo => todo.id == id ? { ...todo, completed:true}: todo))
-    
-      const updatedTodo = {...todo, completed:true}
-      axios.put("http://127.0.0.1:8000/todos/" + id, updatedTodo)
-    }
-    else
-    {
-      console.log("omo")
-      setTodos(todos.map(todo => todo.id == id ? { ...todo, completed:false}: todo))
-
-      const updatedTodo = {...todo, completed:false}
-      axios.put("http://127.0.0.1:8000/todos/" + id, updatedTodo)
-    } 
+    const updatedTodo = { ...todo, completed: e.target.checked };
+    setTodos(todos.map(todo => todo.id == id ? updatedTodo : todo));
+    axios.put("http://127.0.0.1:8000/todos/" + id, updatedTodo);
   };
 
   const filterTodo = (cat_value) => {
-    // setTodos(todos.filter(todo => todo.status == cat_value))
-    setTodos(todos.filter((todo) => todo.status == cat_value))
+    setFilter(cat_value);
+  };
+
+  const getFilteredTodos = () => {
+    if (filter === "All") return todos;
+    if (filter === "Active") return todos.filter(todo => !todo.completed);
+    if (filter === "Completed") return todos.filter(todo => todo.completed);
   };
 
 
@@ -82,7 +75,7 @@ function App() {
       {errors && <div className="errorBox"><p className="error">{errors}</p></div>}
       <Search addTodo = { addTodo } />
       <Filter filter_todo = { filterTodo }/>
-      <TodoList todos = { todos } delTodo = { delTodo } update_todo = { updateTodo } complete_todo = { completeTodo } filter_todo = { filterTodo } />
+      <TodoList todos={getFilteredTodos()} delTodo={delTodo} update_todo={updateTodo} complete_todo={completeTodo} />
     </div>
   );
 };
